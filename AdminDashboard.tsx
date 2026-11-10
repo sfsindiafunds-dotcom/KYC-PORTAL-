@@ -28,17 +28,17 @@ import {
   ZoomIn,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { useAuth } from '../../context/AuthContext.tsx';
-import { KycApplication, KycStatus } from '../../types/index.ts';
+import { useAuth } from './AuthContext.tsx';
+import { KycApplication, KycStatus } from './index.ts';
 import {
   subscribeToLiveApplications,
   updateApplicationStatus,
   deleteClientApplication,
   requestClientResubmission,
   recordAuditLog,
-} from '../../services/clientService.ts';
-import { DISTRIBUTOR_PROFILE } from '../../lib/constants.ts';
-import { generateClientKycPdf } from '../../lib/pdfGenerator.ts';
+} from './clientService.ts';
+import { DISTRIBUTOR_PROFILE } from './constants.ts';
+import { generateClientKycPdf } from './pdfGenerator.ts';
 
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
