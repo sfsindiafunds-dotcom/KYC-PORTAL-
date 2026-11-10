@@ -507,46 +507,8 @@ export function uploadKycDocument(
         }
       },
       (error) => {
-        console.warn('Firebase Storage direct upload note (fallback to server storage service):', error?.message || error);
-        if (onProgress) onProgress(50);
-        
-        // Resilient fallback to server-side storage endpoint (stores real physical image files on disk)
-        const reader = new FileReader();
-        reader.onload = async () => {
-          try {
-            if (onProgress) onProgress(75);
-            const base64Data = reader.result as string;
-            const res = await fetch('/api/upload-document', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId,
-                folder,
-                fileName: rawName,
-                base64Data,
-                contentType: mimeType,
-              }),
-            });
-
-            if (!res.ok) {
-              const errBody = await res.json().catch(() => ({}));
-              throw new Error(errBody.error || 'Server storage upload failed.');
-            }
-
-            const data = await res.json();
-            if (onProgress) onProgress(100);
-
-            resolve({
-              url: data.url,
-              fileName: data.fileName || rawName,
-              size: data.size || size,
-            });
-          } catch (fallbackErr: any) {
-            reject(new Error(fallbackErr.message || 'Image upload failed. Please try again.'));
-          }
-        };
-        reader.onerror = () => reject(new Error('Failed to read image file.'));
-        reader.readAsDataURL(file);
+        console.error('Firebase Storage upload failed; unsafe public-disk fallback is disabled:', error?.message || error);
+        reject(new Error('Secure document upload failed. Please try again later or contact support. No public upload fallback was used.'));
       },
       async () => {
         try {
