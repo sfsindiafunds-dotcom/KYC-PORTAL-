@@ -1,4 +1,4 @@
-import { OccupationType, AnnualIncomeType } from '../types/index.ts';
+import { OccupationType, AnnualIncomeType } from './index.ts';
 
 export const OCCUPATIONS: OccupationType[] = [
   'Salaried – Private Sector',
