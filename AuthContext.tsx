@@ -9,8 +9,8 @@ import {
   sendPasswordResetEmail,
   updateProfile,
 } from 'firebase/auth';
-import { auth, googleProvider, AUTHORIZED_ADVISOR_EMAIL } from '../lib/firebase.ts';
-import { recordAuditLog } from '../services/clientService.ts';
+import { auth, googleProvider, AUTHORIZED_ADVISOR_EMAIL } from './firebase.ts';
+import { recordAuditLog } from './clientService.ts';
 
 export type UserRole = 'advisor' | 'client';
 
