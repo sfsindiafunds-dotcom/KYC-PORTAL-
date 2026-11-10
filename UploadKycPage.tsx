@@ -19,7 +19,7 @@ import {
   Users,
   Trash2,
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext.tsx';
+import { useAuth } from './AuthContext.tsx';
 import {
   KycApplication,
   Gender,
@@ -27,25 +27,25 @@ import {
   OccupationType,
   AnnualIncomeType,
   NomineeDetails,
-} from '../../types/index.ts';
+} from './index.ts';
 import {
   fetchKycApplication,
   saveKycApplication,
   saveSingleDocumentUrlToFirestore,
   removeSingleDocumentFromFirestore,
-} from '../../services/clientService.ts';
+} from './clientService.ts';
 import {
   validateAadhaarVerhoeff,
   validatePanFormat,
   validateMobileFormat,
   validateEmailFormat,
-} from '../../lib/validation.ts';
+} from './validation.ts';
 import {
   OCCUPATIONS,
   ANNUAL_INCOMES,
   INDIAN_STATES,
   DISTRIBUTOR_PROFILE,
-} from '../../lib/constants.ts';
+} from './constants.ts';
 import { KycImageUploadCard } from './KycImageUploadCard.tsx';
 
 type DocumentFieldKey =
