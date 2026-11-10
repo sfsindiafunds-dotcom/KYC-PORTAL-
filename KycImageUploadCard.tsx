@@ -14,7 +14,7 @@ import {
   Circle,
   ImageIcon,
 } from 'lucide-react';
-import { uploadKycDocument } from '../../services/clientService.ts';
+import { uploadKycDocument } from './clientService.ts';
 
 export type UploadStatus = 'not_uploaded' | 'uploading' | 'uploaded' | 'error';
 
