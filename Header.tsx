@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldCheck, LogOut, Lock } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import { DISTRIBUTOR_PROFILE } from '../../lib/constants.ts';
+import { useAuth } from './AuthContext.tsx';
+import { DISTRIBUTOR_PROFILE } from './constants.ts';
 
 export const Header: React.FC = () => {
   const { user, isAdvisor, logout } = useAuth();
