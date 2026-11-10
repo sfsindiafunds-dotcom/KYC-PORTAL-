@@ -13,9 +13,9 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, auth, storage, AUTHORIZED_ADVISOR_EMAIL } from '../lib/firebase.ts';
-import { handleFirestoreError, OperationType } from '../lib/firebaseErrors.ts';
-import { KycApplication, KycStatus, AuditLog } from '../types/index.ts';
+import { db, auth, storage, AUTHORIZED_ADVISOR_EMAIL } from './firebase.ts';
+import { handleFirestoreError, OperationType } from './firebaseErrors.ts';
+import { KycApplication, KycStatus, AuditLog } from './index.ts';
 
 const APPLICATIONS_COLL = 'clients';
 const AUDIT_COLL = 'auditLogs';
