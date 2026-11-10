@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf';
-import { KycApplication } from '../types/index.ts';
+import { KycApplication } from './index.ts';
 import { DISTRIBUTOR_PROFILE } from './constants.ts';
 
 /**
