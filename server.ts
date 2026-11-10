@@ -44,48 +44,12 @@ async function startServer() {
 
   app.use(express.json({ limit: '20mb' }));
 
-  // Serve uploaded client documents statically
-  const uploadsStaticDir = path.join(__dirname, 'public', 'uploads');
-  fs.mkdirSync(uploadsStaticDir, { recursive: true });
-  app.use('/uploads', express.static(uploadsStaticDir));
-
-  // Resilient Server-Side Document Upload endpoint (stores real physical image files on disk)
-  app.post('/api/upload-document', (req: Request, res: Response) => {
-    try {
-      const { userId, folder, fileName, base64Data, contentType } = req.body;
-      if (!userId || !folder || !base64Data) {
-        return res.status(400).json({ error: 'Missing required upload parameters' });
-      }
-
-      const sanitizedUserId = String(userId).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24);
-      const sanitizedFolder = String(folder).replace(/[^a-zA-Z0-9_-]/g, '');
-      const rawName = String(fileName || `${sanitizedFolder}.jpg`);
-      const extMatch = rawName.match(/\.(jpe?g|png)$/i);
-      const ext = extMatch ? extMatch[1].toLowerCase() : 'jpg';
-
-      const uniqueFileName = `${sanitizedFolder}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
-      const targetDir = path.join(__dirname, 'public', 'uploads', 'clients', sanitizedUserId, 'kyc', sanitizedFolder);
-      fs.mkdirSync(targetDir, { recursive: true });
-
-      const filePath = path.join(targetDir, uniqueFileName);
-      const cleanBase64 = String(base64Data).replace(/^data:image\/\w+;base64,/, '');
-      const fileBuffer = Buffer.from(cleanBase64, 'base64');
-      fs.writeFileSync(filePath, fileBuffer);
-
-      const downloadUrl = `/uploads/clients/${sanitizedUserId}/kyc/${sanitizedFolder}/${uniqueFileName}`;
-      console.log(`[KYC STORAGE] Saved ${rawName} for client ${sanitizedUserId} at ${downloadUrl} (${fileBuffer.length} bytes)`);
-
-      return res.json({
-        success: true,
-        url: downloadUrl,
-        fileName: rawName,
-        size: fileBuffer.length,
-        contentType: contentType || (ext === 'png' ? 'image/png' : 'image/jpeg'),
-      });
-    } catch (error) {
-      console.error('[KYC STORAGE UPLOAD ERROR]', error);
-      return res.status(500).json({ error: 'Unable to save uploaded document.' });
-    }
+  // KYC documents must never be served from a public local filesystem directory.
+  // The legacy unauthenticated disk-upload endpoint is intentionally disabled.
+  app.post('/api/upload-document', (_req: Request, res: Response) => {
+    return res.status(410).json({
+      error: 'Legacy server-side uploads are disabled. Configure and use authenticated Firebase Storage uploads.',
+    });
   });
 
   // Initialize Google GenAI SDK (uses GEMINI_API_KEY from environment or Settings > Secrets)
