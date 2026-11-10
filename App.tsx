@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext.tsx';
-import { Header } from './components/layout/Header.tsx';
-import { AuthModal } from './components/auth/AuthModal.tsx';
-import { UploadKycPage } from './components/client/UploadKycPage.tsx';
-import { AdminDashboard } from './components/admin/AdminDashboard.tsx';
-import { DISTRIBUTOR_PROFILE } from './lib/constants.ts';
+import { AuthProvider, useAuth } from './AuthContext.tsx';
+import { Header } from './Header.tsx';
+import { AuthModal } from './AuthModal.tsx';
+import { UploadKycPage } from './UploadKycPage.tsx';
+import { AdminDashboard } from './AdminDashboard.tsx';
+import { DISTRIBUTOR_PROFILE } from './constants.ts';
 import { ShieldCheck, Lock, KeyRound, AlertCircle, ArrowRight } from 'lucide-react';
 
 const AdvisorMfaChallenge: React.FC = () => {
