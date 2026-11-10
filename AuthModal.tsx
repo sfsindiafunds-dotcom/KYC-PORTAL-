@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, AlertCircle, ArrowRight, CheckCircle2, UserPlus, KeyRound } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext.tsx';
-import { DISTRIBUTOR_PROFILE } from '../../lib/constants.ts';
+import { useAuth } from './AuthContext.tsx';
+import { DISTRIBUTOR_PROFILE } from './constants.ts';
 
 export const AuthModal: React.FC = () => {
   const { loginWithGoogle, registerWithEmail } = useAuth();
