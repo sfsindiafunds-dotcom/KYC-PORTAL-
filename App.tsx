@@ -18,8 +18,8 @@ const AdvisorMfaChallenge: React.FC = () => {
     setError(null);
     const trimmed = code.trim();
 
-    if (!trimmed || trimmed !== '0610') {
-      setError('Incorrect code. Please try again.');
+    if (!/^\d{4}$/.test(trimmed)) {
+      setError('Enter the 4-digit security code.');
       return;
     }
 
