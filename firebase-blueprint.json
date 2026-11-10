@@ -1,0 +1,161 @@
+{
+  "entities": {
+    "Admin": {
+      "title": "Admin",
+      "description": "Administrator account authorized to oversee the MFD client lifecycle.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["admin", "superadmin"] },
+        "arnNumber": { "type": "string", "maxLength": 30 },
+        "distributorName": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role"]
+    },
+    "ClientProfile": {
+      "title": "ClientProfile",
+      "description": "Comprehensive MFD Client KYC & Lifecycle record compliant with SEBI and AMFI guidelines.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "clientId": { "type": "string", "maxLength": 64 },
+        "email": { "type": "string", "maxLength": 128 },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "submitted", "under_review", "correction_requested", "verified", "rejected"]
+        },
+        "fullName": { "type": "string", "maxLength": 120 },
+        "fatherOrSpouseName": { "type": "string", "maxLength": 120 },
+        "gender": { "type": "string", "enum": ["Male", "Female", "Other", ""] },
+        "maritalStatus": { "type": "string", "enum": ["Single", "Married", "Other", ""] },
+        "pan": { "type": "string", "maxLength": 10, "pattern": "^[A-Z]{5}[0-9]{4}[A-Z]{1}$" },
+        "aadhaarLast4": { "type": "string", "maxLength": 4, "pattern": "^[0-9]{4}$" },
+        "dateOfBirth": { "type": "string", "maxLength": 12 },
+        "mobile": { "type": "string", "maxLength": 15 },
+        "residentialAddress": {
+          "type": "object",
+          "properties": {
+            "addressLine": { "type": "string", "maxLength": 200 },
+            "city": { "type": "string", "maxLength": 80 },
+            "state": { "type": "string", "maxLength": 80 },
+            "pinCode": { "type": "string", "maxLength": 10 },
+            "country": { "type": "string", "maxLength": 50 },
+            "addressProofType": { "type": "string", "maxLength": 50 }
+          }
+        },
+        "permanentAddress": {
+          "type": "object",
+          "properties": {
+            "sameAsResidential": { "type": "boolean" },
+            "addressLine": { "type": "string", "maxLength": 200 },
+            "city": { "type": "string", "maxLength": 80 },
+            "state": { "type": "string", "maxLength": 80 },
+            "pinCode": { "type": "string", "maxLength": 10 },
+            "country": { "type": "string", "maxLength": 50 }
+          }
+        },
+        "occupation": { "type": "string", "maxLength": 60 },
+        "annualIncome": { "type": "string", "maxLength": 60 },
+        "incomeSource": { "type": "string", "maxLength": 60 },
+        "pepStatus": { "type": "string", "enum": ["no", "yes", "related_to_pep"] },
+        "fatcaDetails": {
+          "type": "object",
+          "properties": {
+            "isIndianTaxResidentOnly": { "type": "boolean" },
+            "countryOfTaxResidency": { "type": "string", "maxLength": 80 },
+            "taxIdentificationNumber": { "type": "string", "maxLength": 80 },
+            "countryOfBirth": { "type": "string", "maxLength": 80 }
+          }
+        },
+        "bankDetails": {
+          "type": "object",
+          "properties": {
+            "accountNumber": { "type": "string", "maxLength": 40 },
+            "accountType": { "type": "string", "maxLength": 30 },
+            "bankName": { "type": "string", "maxLength": 100 },
+            "branchName": { "type": "string", "maxLength": 100 },
+            "ifscCode": { "type": "string", "maxLength": 15, "pattern": "^[A-Z]{4}0[A-Z0-9]{6}$" }
+          }
+        },
+        "nominees": {
+          "type": "array",
+          "description": "Nominees with maximum 3 entries according to SEBI regulations"
+        },
+        "documents": {
+          "type": "object",
+          "properties": {
+            "panCardUrl": { "type": "string", "maxLength": 2000 },
+            "panCardName": { "type": "string", "maxLength": 200 },
+            "addressProofUrl": { "type": "string", "maxLength": 2000 },
+            "addressProofName": { "type": "string", "maxLength": 200 },
+            "cancelledChequeUrl": { "type": "string", "maxLength": 2000 },
+            "cancelledChequeName": { "type": "string", "maxLength": 200 },
+            "photoUrl": { "type": "string", "maxLength": 2000 },
+            "photoName": { "type": "string", "maxLength": 200 },
+            "signatureUrl": { "type": "string", "maxLength": 2000 },
+            "signatureType": { "type": "string", "maxLength": 50 }
+          }
+        },
+        "consentObtained": { "type": "boolean" },
+        "consentTimestamp": { "type": "string", "maxLength": 40 },
+        "adminRemarks": { "type": "string", "maxLength": 1000 },
+        "correctionFields": { "type": "array" },
+        "submittedAt": { "type": "string", "maxLength": 40 },
+        "verifiedAt": { "type": "string", "maxLength": 40 },
+        "createdAt": { "type": "string", "maxLength": 40 },
+        "updatedAt": { "type": "string", "maxLength": 40 }
+      },
+      "required": ["userId", "email", "status"]
+    },
+    "Invitation": {
+      "title": "Invitation",
+      "description": "Distributor-issued client invitation records.",
+      "type": "object",
+      "properties": {
+        "inviteId": { "type": "string", "maxLength": 64 },
+        "email": { "type": "string", "maxLength": 128 },
+        "fullName": { "type": "string", "maxLength": 120 },
+        "mobile": { "type": "string", "maxLength": 15 },
+        "clientId": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "enum": ["pending", "accepted", "expired"] },
+        "createdAt": { "type": "string", "maxLength": 40 },
+        "createdBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["inviteId", "email", "fullName", "clientId", "status"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable compliance and security activity log for KYC actions.",
+      "type": "object",
+      "properties": {
+        "action": { "type": "string", "maxLength": 100 },
+        "actorId": { "type": "string", "maxLength": 128 },
+        "actorEmail": { "type": "string", "maxLength": 128 },
+        "targetClientId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 1000 },
+        "ipAddress": { "type": "string", "maxLength": 64 },
+        "timestamp": { "type": "string", "maxLength": 40 }
+      },
+      "required": ["action", "actorId", "actorEmail", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Stores administrator credentials and distributor profile data."
+    },
+    "/clients/{clientId}": {
+      "schema": "ClientProfile",
+      "description": "Stores individual client KYC profiles, accessible only by the respective client and admin."
+    },
+    "/invitations/{invitationId}": {
+      "schema": "Invitation",
+      "description": "Stores distributor invitation records."
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Stores compliance audit trail for SEBI/AMFI regulatory oversight."
+    }
+  }
+}

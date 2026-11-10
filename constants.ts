@@ -1,0 +1,73 @@
+import { OccupationType, AnnualIncomeType } from '../types/index.ts';
+
+export const OCCUPATIONS: OccupationType[] = [
+  'Salaried – Private Sector',
+  'Salaried – Government',
+  'Business / Self-Employed',
+  'Professional',
+  'Agriculture',
+  'Retired',
+  'Housewife',
+  'Student',
+  'Others',
+];
+
+export const ANNUAL_INCOMES: AnnualIncomeType[] = [
+  'Below ₹1 Lakh',
+  '₹1–5 Lakh',
+  '₹5–10 Lakh',
+  '₹10–25 Lakh',
+  '₹25 Lakh–1 Crore',
+  'Above ₹1 Crore',
+];
+
+export const INDIAN_STATES = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+  'Andaman and Nicobar Islands',
+  'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi (NCT)',
+  'Jammu and Kashmir',
+  'Ladakh',
+  'Lakshadweep',
+  'Puducherry',
+];
+
+export const DISTRIBUTOR_PROFILE = {
+  name: 'Scientific Fin Serv',
+  portalTitle: 'Scientific Fin Serv KYC Portal',
+  subtitle: 'Secure Client KYC Submission',
+  companyDescription: 'Scientific Fin Serv • Authorized AMFI Registered Mutual Fund Distributor',
+  principalEmail: 'sfsindiafunds@gmail.com',
+  arn: 'ARN - 357716',
+  euin: 'E458291',
+  phone: '+91 98200 12345',
+  address: 'Level 4, Nariman Point, Mumbai, Maharashtra 400021',
+};

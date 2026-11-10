@@ -1,0 +1,6 @@
+{
+  "name": "Scientific Fin Serv KYC Portal",
+  "description": "Scientific Fin Serv KYC Portal - Secure Client KYC document submission and live real-time advisor management dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

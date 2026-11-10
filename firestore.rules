@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Default-deny catch-all (Global Safety Net)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedEmail() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'sfsindiafunds@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && (isAdmin() || request.auth.uid == adminId);
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Clients Collection (Each Client record isolated to that client or Admin)
+    match /clients/{clientId} {
+      allow get: if isSignedIn() && (
+        isAdmin() ||
+        clientId == request.auth.uid ||
+        (resource != null && 'userId' in resource.data && resource.data.userId == request.auth.uid) ||
+        (resource != null && 'email' in resource.data && resource.data.email == request.auth.token.email)
+      );
+
+      // Secure list query: isolated to admin or client's own records
+      allow list: if isSignedIn() && (
+        isAdmin() ||
+        (resource != null && 'userId' in resource.data && resource.data.userId == request.auth.uid)
+      );
+
+      // Create: Admin or Client for their own document
+      allow create: if isSignedIn() && (
+        isAdmin() ||
+        clientId == request.auth.uid ||
+        (incoming() != null && 'userId' in incoming() && incoming().userId == request.auth.uid)
+      );
+
+      // Update: Admin can update all fields (status, review remarks, etc.)
+      // Client can update their own record
+      allow update: if isSignedIn() && (
+        isAdmin() ||
+        clientId == request.auth.uid ||
+        (resource != null && 'userId' in resource.data && resource.data.userId == request.auth.uid)
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // Invitations Collection
+    match /invitations/{inviteId} {
+      allow get: if isSignedIn() && (
+        isAdmin() ||
+        (resource != null && 'email' in resource.data && resource.data.email == request.auth.token.email)
+      );
+
+      allow list: if isSignedIn() && (
+        isAdmin() ||
+        (resource != null && 'email' in resource.data && resource.data.email == request.auth.token.email)
+      );
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Audit Logs Collection (Append-only for compliance & security)
+    match /auditLogs/{logId} {
+      allow get, list: if isAdmin();
+      allow create: if isSignedIn() && incoming().actorId == request.auth.uid;
+      allow update, delete: if false; // Immutable audit trail
+    }
+  }
+}
