@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const providerId = currentUser.providerData?.[0]?.providerId || 'password';
       const email = currentUser.email || '';
-      const emailVerified = currentUser.emailVerified || providerId === 'google.com';
+      const emailVerified = currentUser.emailVerified === true;
 
       const response = await fetch('/api/verify-advisor', {
         method: 'POST',
@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Fallback strict client-side check
     const normalized = (currentUser.email || '').trim().toLowerCase();
     const hasGoogleProvider = currentUser.providerData?.some((p) => p.providerId === 'google.com');
-    return normalized === AUTHORIZED_ADVISOR_EMAIL.toLowerCase() && !!hasGoogleProvider;
+    return normalized === AUTHORIZED_ADVISOR_EMAIL.toLowerCase() && !!hasGoogleProvider && currentUser.emailVerified === true;
   };
 
   useEffect(() => {
