@@ -82,6 +82,9 @@ async function startServer() {
         size: fileBuffer.length,
         contentType: contentType || (ext === 'png' ? 'image/png' : 'image/jpeg'),
       });
+    } catch (error) {
+      console.error('[KYC STORAGE UPLOAD ERROR]', error);
+      return res.status(500).json({ error: 'Unable to save uploaded document.' });
     }
   });
 
