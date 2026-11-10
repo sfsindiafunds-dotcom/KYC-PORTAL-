@@ -2,91 +2,105 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 1. Default-deny catch-all (Global Safety Net)
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // Helper Functions
-    function isSignedIn() {
+    function signedIn() {
       return request.auth != null;
     }
 
-    function isVerifiedEmail() {
-      return isSignedIn() && request.auth.token.email_verified == true;
+    function verifiedEmail() {
+      return signedIn() && request.auth.token.email_verified == true;
     }
 
     function isAdmin() {
-      return isSignedIn() && (
+      return verifiedEmail() && (
         request.auth.token.email == 'sfsindiafunds@gmail.com' ||
         exists(/databases/$(database)/documents/admins/$(request.auth.uid))
       );
     }
 
-    function incoming() {
-      return request.resource.data;
+    function clientOwns(clientId) {
+      return signedIn() && (
+        clientId == request.auth.uid ||
+        (resource != null && resource.data.userId == request.auth.uid)
+      );
     }
 
-    // Admins Collection
+    function clientEditableFields() {
+      return [
+        'fullName', 'dateOfBirth', 'gender', 'maritalStatus', 'mobile',
+        'pan', 'aadhaarNumber', 'aadhaarLast4', 'aadhaarConsentGranted',
+        'address', 'occupation', 'annualIncome', 'nominee', 'documents',
+        'consentCheckbox', 'submittedAt', 'resubmittedAt', 'updatedAt'
+      ];
+    }
+
     match /admins/{adminId} {
-      allow get: if isSignedIn() && (isAdmin() || request.auth.uid == adminId);
+      allow get: if verifiedEmail() && (isAdmin() || request.auth.uid == adminId);
       allow list: if isAdmin();
-      allow write: if isAdmin();
+      allow create, update, delete: if isAdmin() && adminId != request.auth.uid;
     }
 
-    // Clients Collection (Each Client record isolated to that client or Admin)
     match /clients/{clientId} {
-      allow get: if isSignedIn() && (
-        isAdmin() ||
-        clientId == request.auth.uid ||
-        (resource != null && 'userId' in resource.data && resource.data.userId == request.auth.uid) ||
-        (resource != null && 'email' in resource.data && resource.data.email == request.auth.token.email)
+      allow get: if isAdmin() || clientOwns(clientId);
+      allow list: if isAdmin() || (
+        signedIn() && resource.data.userId == request.auth.uid
       );
 
-      // Secure list query: isolated to admin or client's own records
-      allow list: if isSignedIn() && (
-        isAdmin() ||
-        (resource != null && 'userId' in resource.data && resource.data.userId == request.auth.uid)
+      allow create: if isAdmin() || (
+        signedIn() &&
+        clientId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status == 'draft' &&
+        request.resource.data.keys().hasOnly([
+          'userId', 'email', 'status', 'createdAt', 'updatedAt', 'documents',
+          'fullName', 'dateOfBirth', 'gender', 'maritalStatus', 'mobile',
+          'pan', 'aadhaarNumber', 'aadhaarLast4', 'aadhaarConsentGranted',
+          'address', 'occupation', 'annualIncome', 'nominee',
+          'consentCheckbox', 'submittedAt', 'resubmittedAt', 'applicationId'
+        ])
       );
 
-      // Create: Admin or Client for their own document
-      allow create: if isSignedIn() && (
-        isAdmin() ||
-        clientId == request.auth.uid ||
-        (incoming() != null && 'userId' in incoming() && incoming().userId == request.auth.uid)
-      );
-
-      // Update: Admin can update all fields (status, review remarks, etc.)
-      // Client can update their own record
-      allow update: if isSignedIn() && (
-        isAdmin() ||
-        clientId == request.auth.uid ||
-        (resource != null && 'userId' in resource.data && resource.data.userId == request.auth.uid)
+      allow update: if isAdmin() || (
+        clientOwns(clientId) &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(clientEditableFields()) &&
+        (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status']) ||
+          (
+            resource.data.status in ['draft', 'resubmission_requested', 'correction_requested'] &&
+            request.resource.data.status in ['pending', 'resubmitted'] &&
+            request.resource.data.consentCheckbox == true
+          )
+        ) &&
+        (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['consentCheckbox']) ||
+          request.resource.data.consentCheckbox == true
+        )
       );
 
       allow delete: if isAdmin();
     }
 
-    // Invitations Collection
     match /invitations/{inviteId} {
-      allow get: if isSignedIn() && (
-        isAdmin() ||
-        (resource != null && 'email' in resource.data && resource.data.email == request.auth.token.email)
+      allow get: if isAdmin() || (
+        signedIn() && resource.data.email == request.auth.token.email
       );
-
-      allow list: if isSignedIn() && (
-        isAdmin() ||
-        (resource != null && 'email' in resource.data && resource.data.email == request.auth.token.email)
-      );
-
+      allow list: if isAdmin();
       allow create, update, delete: if isAdmin();
     }
 
-    // Audit Logs Collection (Append-only for compliance & security)
     match /auditLogs/{logId} {
       allow get, list: if isAdmin();
-      allow create: if isSignedIn() && incoming().actorId == request.auth.uid;
-      allow update, delete: if false; // Immutable audit trail
+      allow create: if signedIn() &&
+        request.resource.data.actorId == request.auth.uid &&
+        request.resource.data.keys().hasOnly([
+          'action', 'actorId', 'actorEmail', 'targetApplicationId', 'details', 'timestamp'
+        ]);
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
