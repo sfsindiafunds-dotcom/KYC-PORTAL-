@@ -38,7 +38,7 @@ jobs:
             -x '.git/*' 'node_modules/*' 'dist/*' 'coverage/*' \
                '.env' '.env.*' '!.env.example' '.firebase/*' \
                'service-account*.json' '*-firebase-adminsdk-*.json' \
-               '*.pem' '*.key' 'kyc.zip' '*.kyc.zip' 'private-kyc/*'
+               '*.pem' '*.key' 'kyc.zip' '*.kyc.zip' 'private-kyc/*' 'kyc-portal-google-ai-studio.zip'
       - name: Upload project ZIP
         uses: actions/upload-artifact@v4
         with:
