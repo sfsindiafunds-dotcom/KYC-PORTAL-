@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function verifiedAdvisor() {
+      return signedIn()
+        && request.auth.token.email == 'sfsindiafunds@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    match /clients/{userId}/kyc/{folder}/{fileName} {
+      // Clients can access only their own documents. The verified advisor can
+      // review documents for KYC processing.
+      allow read: if signedIn()
+        && (request.auth.uid == userId || verifiedAdvisor());
+
+      // Accept only small JPEG/PNG images uploaded by the owner.
+      allow create, update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png)')
+        && request.resource.metadata.userId == userId
+        && request.resource.metadata.folder == folder;
+
+      // A client may delete only their own files; advisor cleanup is allowed.
+      allow delete: if signedIn()
+        && (request.auth.uid == userId || verifiedAdvisor());
+    }
+
+    // No other Storage paths are accessible.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
