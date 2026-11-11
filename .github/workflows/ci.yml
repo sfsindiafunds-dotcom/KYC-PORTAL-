@@ -27,3 +27,22 @@ jobs:
         run: npm run lint
       - name: Production build
         run: npm run build
+      - name: Validate Firebase configuration and rules files
+        run: |
+          node -e "const c=require('./firebase-applet-config.json'); for (const k of ['projectId','appId','apiKey','authDomain','storageBucket','firestoreDatabaseId']) if (!c[k]) throw new Error('Missing Firebase config field: '+k)"
+          test -s firestore.rules
+          test -s storage.rules
+      - name: Package importable project ZIP
+        run: |
+          zip -r kyc-portal-google-ai-studio.zip . \
+            -x '.git/*' 'node_modules/*' 'dist/*' 'coverage/*' \
+               '.env' '.env.*' '!.env.example' '.firebase/*' \
+               'service-account*.json' '*-firebase-adminsdk-*.json' \
+               '*.pem' '*.key' 'kyc.zip' '*.kyc.zip' 'private-kyc/*'
+      - name: Upload project ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: kyc-portal-google-ai-studio
+          path: kyc-portal-google-ai-studio.zip
+          if-no-files-found: error
+          retention-days: 14
